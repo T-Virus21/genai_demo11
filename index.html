@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Metrics Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f4f7fa;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #2c3e50;
+        }
+
+        header nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+
+        header nav ul li {
+            margin-left: 20px;
+        }
+
+        header nav ul li a {
+            text-decoration: none;
+            color: #777;
+            font-size: 0.9em;
+        }
+        header nav ul li a:hover {
+            color: #2c3e50;
+        }
+
+        main {
+            display: flex;
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .sidebar {
+            width: 250px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-right: 20px;
+        }
+
+        .sidebar h2 {
+            font-size: 1.1em;
+            margin-top: 0;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar ul li label {
+            display: flex;
+            align-items: center;
+            color: #555;
+            font-size: 0.95em;
+        }
+        .sidebar ul li label input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+
+        .content {
+            flex-grow: 1;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-header {
+            margin-bottom: 20px;
+        }
+
+        .content-header h2 {
+            font-size: 1.5em;
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .search-bar {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .search-bar p {
+            margin: 0 0 10px 0;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .visualize-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .visualize-section h3 {
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .visualize-inputs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .visualize-inputs input[type="text"], .visualize-inputs select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            flex: 1;
+            min-width: 100px; /* Adjust as needed */
+        }
+        .visualize-inputs button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+            gap: 20px;
+        }
+
+        .metric-card {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+        }
+
+        .metric-card img {
+            max-width: 80px;
+            max-height: 80px;
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .metric-card h4 {
+            font-size: 1em;
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .metric-card p {
+            font-size: 0.85em;
+            color: #777;
+            margin-bottom: 0;
+        }
+
+        .showing-metrics {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .showing-metrics select {
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            margin: 0 5px;
+            text-decoration: none;
+            color: #555;
+            border-radius: 3px;
+        }
+
+        .pagination a.active {
+            background-color: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+        }
+
+        .pagination a:hover:not(.active) {
+            background-color: #eee;
+        }
+
+        footer {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            font-size: 0.8em;
+            color: #777;
+        }
+        footer h5 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+        footer ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        footer ul li a {
+            text-decoration: none;
+            color: #777;
+        }
+        footer ul li a:hover {
+            color: #2c3e50;
+        }
+
+        /* Placeholder images - replace with actual icons or images */
+        .metric-card img[src="placeholder.png"] {
+            content: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='); /* 1x1 transparent pixel */
+            background-color: #ddd;
+            border-radius: 50%;
+        }
+        .metric-card img[src="ai.png"] {
+            background-color: #ddd;
+            border-radius: 50%;
+            width: 80px; height: 80px; object-fit: contain; padding: 10px; box-sizing: border-box;
+        }
+        .metric-card img[src="compliance.png"] {
+            background-color: #ddd;
+            border-radius: 50%;
+            width: 80px; height: 80px; object-fit: contain; padding: 10px; box-sizing: border-box;
+        }
+        .metric-card img[src="accuracy.png"] {
+            background-color: #ddd;
+            border-radius: 50%;
+            width: 80px; height: 80px; object-fit: contain; padding: 10px; box-sizing: border-box;
+        }
+        .metric-card img[src="completeness.png"] {
+            background-color: #ddd;
+            border-radius: 50%;
+            width: 80px; height: 80px; object-fit: contain; padding: 10px; box-sizing: border-box;
+        }
+        .metric-card img[src="security.png"] {
+            background-color: #ddd;
+            border-radius: 50%;
+            width: 80px; height: 80px; object-fit: contain; padding: 10px; box-sizing: border-box;
+        }
+        .metric-card img[src="cleansing.png"] {
+            background-color: #ddd;
+            border-radius: 50%;
+            width: 80px; height: 80px; object-fit: contain; padding: 10px; box-sizing: border-box;
+        }
+        .metric-card img[src="profiling.png"] {
+            background-color: #ddd;
+            border-radius: 50%;
+            width: 80px; height: 80px; object-fit: contain; padding: 10px; box-sizing: border-box;
+        }
+        .metric-card img[src="monitoring.png"] {
+            background-color: #ddd;
+            border-radius: 50%;
+            width: 80px; height: 80px; object-fit: contain; padding: 10px; box-sizing: border-box;
+        }
+        .metric-card img[src="governance.png"] {
+            background-color: #ddd;
+            border-radius: 50%;
+            width: 80px; height: 80px; object-fit: contain; padding: 10px; box-sizing: border-box;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Data Metrics</h1>
+            <nav>
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Analyze data</a></li>
+                    <li><a href="#">Insights</a></li>
+                    <li><a href="#">View details</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="sidebar">
+                <h2>Refine data health analysis</h2>
+                <ul>
+                    <li><label><input type="checkbox" checked> Data Analyst Profile</label></li>
+                    <li><label><input type="checkbox" checked> Data Quality Check</label></li>
+                    <li><label><input type="checkbox" checked> Compilance Check</label></li>
+                    <li><label><input type="checkbox" checked> Data Visualization</label></li>
+                    <li><label><input type="checkbox" checked> Data Security</label></li>
+                    <li><label><input type="checkbox" checked> Data Privacy</label></li>
+                    <li>
+                        <strong>Explore more</strong>
+                        <ul>
+                            <li><label><input type="checkbox" checked> Data Validation</label></li>
+                            <li><label><input type="checkbox" checked> Data Integrity</label></li>
+                            <li><label><input type="checkbox" checked> Data Governance</label></li>
+                            <li><label><input type="checkbox" checked> Data Monitoring</label></li>
+                            <li><label><input type="checkbox" checked> Data Protection</label></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Data Location</strong>
+                        <ul>
+                            <li><label><input type="checkbox" > Data Country</label></li>
+                            <li><label><input type="checkbox" > Data Region</label></li>
+                        </ul>
+                    </li>
+                </ul>
+                <button style="margin-top: 20px; width: 100%;" onclick="analyzeData()">Analyze data</button>
+            </div>
+
+            <div class="content">
+                <div class="content-header">
+                    <h2>Search and analyze data health metrics</h2>
+                </div>
+                <div class="search-bar">
+                    <p>Select parameters for analysis:</p>
+                    </div>
+
+                <div class="visualize-section">
+                    <h3>Visualize data health metrics</h3>
+                    <div class="visualize-inputs">
+                        <input type="text" placeholder="Parameter 1">
+                        <select>
+                            <option value="">Select Parameter 2</option>
+                            <option value="option1">Option 1</option>
+                            <option value="option2">Option 2</option>
+                        </select>
+                        <button onclick="visualizeData()">Visualize</button>
+                    </div>
+                </div>
+
+                <div class="showing-metrics">
+                    Showing 175 data health metrics
+                    <div>
+                        Sort by:
+                        <select>
+                            <option>Quality co</option>
+                            <option>Name</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <img src="placeholder.png" alt="Quality Assurance Metrics">
+                        <h4>Quality Assurance Metrics</h4>
+                        <p>Data validation checks</p>
+                    </div>
+                    <div class="metric-card">
+                        <img src="compliance.png" src="compliance.png" alt="Data Compliance Metrics">
+                        <h4>Data Compliance Metrics</h4>
+                        <p>Regulatory requirements</p>
+                    </div>
+                    <div class="metric-card">
+                        <img src="accuracy.png" src="accuracy.png" alt="Data Accuracy Metrics">
+                        <h4>Data Accuracy Metrics</h4>
+                        <p>Precision and correctness</p>
+                    </div>
+                    <div class="metric-card">
+                        <img src="completeness.png" src="completeness.png" alt="Data Completeness">
+                        <h4>Data Completeness</h4>
+                        <p>Data integrity checks</p>
+                    </div>
+                    <div class="metric-card">
+                        <img src="security.png" src="security.png" alt="Data Security Metrics">
+                        <h4>Data Security Metrics</h4>
+                        <p>Data protection measures</p>
+                    </div>
+                    <div class="metric-card">
+                        <img src="cleansing.png" src="cleansing.png" alt="Data Cleansing Metrics">
+                        <h4>Data Cleansing Metrics</h4>
+                        <p>Data scrubbing process</p>
+                    </div>
+                    <div class="metric-card">
+                        <img src="profiling.png" src="profiling.png" alt="Data Profiling Metrics">
+                        <h4>Data Profiling Metrics</h4>
+                        <p>Data pattern analysis</p>
+                    </div>
+                    <div class="metric-card">
+                        <img src="monitoring.png" src="monitoring.png" alt="Data Monitoring Metrics">
+                        <h4>Data Monitoring Metrics</h4>
+                        <p>Real-time data tracking</p>
+                    </div>
+                    <div class="metric-card">
+                        <img src="governance.png" src="governance.png" alt="Data Governance Metrics">
+                        <h4>Data Governance Metrics</h4>
+                        <p>Data policy compliance</p>
+                    </div>
+                    <div class="metric-card">
+                        <img src="ai.png" src="ai.png" alt="AI">
+                        <h4>AI</h4>
+                        <p>...</p>
+                    </div>
+                    </div>
+
+                <div class="pagination">
+                    <a href="#" class="active">1</a>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#">...</a>
+                    <a href="#">20</a>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <h5>DataHealthPr</h5>
+            <ul>
+                <li><strong>Data Company</strong></li>
+                <li><a href="#">Data Insights</a></li>
+                <li><a href="#">Data Trends</a></li>
+                <li><a href="#">Data Reports</a></li>
+            </ul>
+            <ul>
+                <li><strong>Data Community</strong></li>
+                <li><a href="#">Data Analysis Data</a></li>
+                <li><a href="#">Visualization Data</a></li>
+                <li><a href="#">Compliance</a></li>
+            </ul>
+            <ul>
+                <li><strong>Data</strong></li>
+                <li><a href="#">Data Support Data</a></li>
+                <li><a href="#">FAQ Data App</a></li>
+            </ul>
+            <p>&copy; 2024 Data Metrics. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        function analyzeData() {
+            alert('Analyze data functionality would be implemented here.');
+        }
+        function visualizeData() {
+            alert('Visualize data functionality would be implemented here.');
+        }
+    </script>
+</body>
+</html>
